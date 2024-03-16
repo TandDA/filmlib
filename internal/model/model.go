@@ -17,3 +17,12 @@ type Film struct {
 	ReleaseDate time.Time
 	Rating      int
 }
+
+type ActorUpdate struct {
+	Id            int
+	Name          string
+	Male          bool
+	BirthDate     time.Time
+	AddFilmIds    []int
+	DeleteFilmIds []int
+}

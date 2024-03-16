@@ -24,3 +24,61 @@ func (r *ActorRepository) Save(actor model.Actor) (int, error) {
 	}
 	return id, nil
 }
+
+func (r *ActorRepository) Update(actor model.ActorUpdate) error {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+	actorQuery := "UPDATE actor SET name=$1, male=$2, birth_date=$3 WHERE id=$4;"
+	_, err = tx.Exec(actorQuery, actor.Name, actor.Male, actor.BirthDate, actor.Id)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	for addId := range actor.AddFilmIds {
+		_, err := tx.Exec("INSERT INTO actor_film(actor_id, film_id) VALUES ($1, $2);", actor.Id, addId)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	for delId := range actor.AddFilmIds {
+		_, err := tx.Exec("DELETE FROM actor_film(actor_id, film_id) WHERE actor_id=$1 AND film_id=$2;", actor.Id, delId)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	return tx.Commit()
+}
+
+func (r *ActorRepository) Delete(actorId int) error {
+	query := "DELETE FROM actor WHERE id=$1;"
+	_, err := r.db.Exec(query, actorId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *ActorRepository) GetAll() ([]model.Actor, error) {
+	actorQuery := "SELECT * FROM actor;"
+	actorRows, err := r.db.Query(actorQuery) // TODO transactions?
+	if err != nil {
+		return nil, err
+	}
+	defer actorRows.Close()
+
+	actors := []model.Actor{}
+	for actorRows.Next() {
+		actor := model.Actor{}
+		err := actorRows.Scan(&actor.Id, &actor.Name, &actor.Male, &actor.BirthDate)
+		if err != nil {
+			// TODO LOG
+			continue
+		}
+		actors = append(actors, actor) // TODO add films to actor entity
+	}
+	return actors, nil
+}
