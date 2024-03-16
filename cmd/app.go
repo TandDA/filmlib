@@ -5,6 +5,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/TandDA/filmlib/internal/handler"
+	"github.com/TandDA/filmlib/internal/repository"
+	"github.com/TandDA/filmlib/internal/service"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -17,6 +20,15 @@ func main() {
 		log.Print(err)
 		return
 	}
+	doMigration(db)
+
+	repo := repository.NewRepository(db)
+	service := service.NewService(repo)
+	handler := handler.NewHandler(service)
+	http.ListenAndServe(":8080", handler.InitRoutes())
+}
+
+func doMigration(db *sql.DB) {
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
 		log.Print(err)
@@ -30,5 +42,4 @@ func main() {
 		return
 	}
 	m.Up()
-	http.ListenAndServe(":8080", nil)
 }

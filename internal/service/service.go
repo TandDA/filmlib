@@ -1,9 +1,8 @@
-package repository
+package service
 
 import (
-	"database/sql"
-
 	"github.com/TandDA/filmlib/internal/model"
+	"github.com/TandDA/filmlib/internal/repository"
 )
 
 type Actor interface {
@@ -14,19 +13,17 @@ type Actor interface {
 }
 
 type Film interface {
-	Save(film model.Film) (int, error)
-	Update(film model.Film) error
+	Save(actor model.Film) (int, error)
+	Update(actor model.Film) error
 	Delete(filmId int) error
 	GetByName(filmName, actorName string) ([]Film, error)
 	GetWithSort() ([]Film, error)
 }
 
-type Repository struct {
+type Service struct {
 	Actor
 }
 
-func NewRepository(db *sql.DB) *Repository {
-	return &Repository{
-		Actor: NewActorRepository(db),
-	}
+func NewService(repo *repository.Repository) *Service {
+	return &Service{Actor: NewActorService(repo.Actor)}
 }

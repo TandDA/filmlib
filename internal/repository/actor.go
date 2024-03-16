@@ -17,7 +17,7 @@ func NewActorRepository(db *sql.DB) *ActorRepository {
 func (r *ActorRepository) Save(actor model.Actor) (int, error) {
 	query := "INSERT INTO actor(name,male,birth_date) VALUES($1,$2,$3) RETURNING id;"
 	var id int
-	row := r.db.QueryRow(query, actor.Name, actor.Male, actor.BirthDate)
+	row := r.db.QueryRow(query, actor.Name, actor.Male, actor.BirthDate.GetString()) // TODO film saving in actor_film table
 	err := row.Scan(&id)
 	if err != nil {
 		return 0, err
@@ -31,7 +31,7 @@ func (r *ActorRepository) Update(actor model.ActorUpdate) error {
 		return err
 	}
 	actorQuery := "UPDATE actor SET name=$1, male=$2, birth_date=$3 WHERE id=$4;"
-	_, err = tx.Exec(actorQuery, actor.Name, actor.Male, actor.BirthDate, actor.Id)
+	_, err = tx.Exec(actorQuery, actor.Name, actor.Male, actor.BirthDate.GetString(), actor.Id)
 	if err != nil {
 		tx.Rollback()
 		return err
