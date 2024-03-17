@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/TandDA/filmlib/internal/model"
+	"github.com/sirupsen/logrus"
 )
 
 type ActorRepository struct {
@@ -75,7 +76,7 @@ func (r *ActorRepository) GetAll() ([]model.Actor, error) {
 		actor := model.Actor{}
 		err := actorRows.Scan(&actor.Id, &actor.Name, &actor.Male, &actor.BirthDate)
 		if err != nil {
-			// TODO LOG
+			logrus.Error("Cannot read actor details")
 			continue
 		}
 		actors = append(actors, actor)

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/TandDA/filmlib/internal/model"
+	"github.com/sirupsen/logrus"
 )
 
 type FilmRepository struct {
@@ -68,7 +69,8 @@ func (r *FilmRepository) GetByPartialName(filmName, actorName string) ([]model.F
 		film := model.Film{}
 		err := rows.Scan(&film.Id, &film.Name, &film.Description, &film.ReleaseDate, &film.Rating)
 		if err != nil {
-			continue // TODO log
+			logrus.Error("Cannot read film from rows")
+			continue
 		}
 		films = append(films, film)
 	}
@@ -97,7 +99,8 @@ func (r *FilmRepository) GetWithSort(column, direction string) ([]model.Film, er
 		film := model.Film{}
 		err := rows.Scan(&film.Id, &film.Name, &film.Description, &film.ReleaseDate, &film.Rating)
 		if err != nil {
-			continue // TODO log
+			logrus.Error("Cannot read film from rows")
+			continue
 		}
 		films = append(films, film)
 	}
@@ -124,7 +127,8 @@ func (r *FilmRepository) GetByActorName(actorName string) ([]model.Film, error) 
 		film := model.Film{}
 		err := rows.Scan(&film.Id, &film.Name, &film.Description, &film.ReleaseDate, &film.Rating)
 		if err != nil {
-			continue // TODO log
+			logrus.Error("Cannot read film from db")
+			continue
 		}
 		films = append(films, film)
 	}

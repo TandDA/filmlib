@@ -4,18 +4,20 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/TandDA/filmlib/internal/middleware"
 	"github.com/TandDA/filmlib/internal/service"
 	"github.com/go-playground/validator/v10"
+	"github.com/sirupsen/logrus"
 )
 
 type Handler struct {
-	service *service.Service
+	service  *service.Service
 	validate *validator.Validate
 }
 
 func NewHandler(service *service.Service, validate *validator.Validate) *Handler {
 	return &Handler{
-		service: service,
+		service:  service,
 		validate: validate,
 	}
 }
@@ -32,13 +34,15 @@ func (h *Handler) InitRoutes() http.Handler {
 	stdMux.HandleFunc("/film/update", h.updateFilm)
 	stdMux.HandleFunc("/film/delete", h.deleteFilm)
 	stdMux.HandleFunc("/film/save", h.saveFilm)
-	return stdMux
+
+	siteHandler := middleware.Logger(stdMux)
+	return siteHandler
 }
 
 func returnErr(w http.ResponseWriter, statusCode int, requestErr error) {
 	js, err := json.Marshal(map[string]string{"err": requestErr.Error()})
 	if err != nil {
-		//TODO log
+		logrus.Error("Cannot convert error to json")
 	}
 	http.Error(w, string(js), statusCode)
 }
@@ -46,7 +50,7 @@ func returnErr(w http.ResponseWriter, statusCode int, requestErr error) {
 func returnJSON(w http.ResponseWriter, v any, statusCode int) {
 	js, err := json.Marshal(v)
 	if err != nil {
-		//TODO log
+		logrus.Error("Cannot convert object to json")
 	}
 	w.WriteHeader(statusCode)
 	w.Write(js)

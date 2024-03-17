@@ -13,9 +13,12 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+
 	db, err := sql.Open("postgres", "postgres://postgres:123@localhost:5432/postgres?sslmode=disable")
 	if err != nil {
 		log.Print(err)
