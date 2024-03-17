@@ -6,22 +6,34 @@ import (
 )
 
 type ActorService struct {
-	repo repository.Actor
+	actorRepo repository.Actor
+	filmRepo  repository.Film
 }
 
-func NewActorService(repo repository.Actor) *ActorService {
-	return &ActorService{repo: repo}
+func NewActorService(actorRepo repository.Actor, filmRepo repository.Film) *ActorService {
+	return &ActorService{actorRepo: actorRepo, filmRepo: filmRepo}
 }
 
 func (s *ActorService) Save(actor model.Actor) (int, error) {
-	return s.repo.Save(actor)
+	return s.actorRepo.Save(actor)
 }
 func (s *ActorService) Update(actor model.ActorUpdate) error {
-	return s.repo.Update(actor)
+	return s.actorRepo.Update(actor)
 }
 func (s *ActorService) Delete(actorId int) error {
-	return s.repo.Delete(actorId)
+	return s.actorRepo.Delete(actorId)
 }
 func (s *ActorService) GetAll() ([]model.Actor, error) {
-	return s.repo.GetAll()
+	actors, err := s.actorRepo.GetAll()
+	if err != nil {
+		return nil, err
+	}
+	for i := range actors {
+		films, err := s.filmRepo.GetByActorName(actors[i].Name)
+		if err != nil {
+			return nil, err
+		}
+		actors[i].Films = append(actors[i].Films, films...)
+	}
+	return actors, nil
 }

@@ -22,8 +22,8 @@ func (s *FilmService) Update(film model.Film) error {
 func (s *FilmService) Delete(filmId int) error {
 	return s.repo.Delete(filmId)
 }
-func (s *FilmService) GetByName(filmName, actorName string) ([]model.Film, error) {
-	return s.repo.GetByName(filmName, actorName)
+func (s *FilmService) GetByPartialName(filmName, actorName string) ([]model.Film, error) {
+	return s.repo.GetByPartialName(filmName, actorName)
 }
 func (s *FilmService) GetWithSort(column, direction string) ([]model.Film, error) {
 	return s.repo.GetWithSort(column, direction)

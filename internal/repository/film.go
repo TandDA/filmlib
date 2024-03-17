@@ -49,7 +49,7 @@ func (r *FilmRepository) Delete(filmId int) error {
 	_, err := r.db.Exec(query, filmId)
 	return err
 }
-func (r *FilmRepository) GetByName(filmName, actorName string) ([]model.Film, error) {
+func (r *FilmRepository) GetByPartialName(filmName, actorName string) ([]model.Film, error) {
 	query := `
 	SELECT DISTINCT film.id, film.name, description, release_date, rating 
 	FROM film
@@ -87,6 +87,33 @@ func (r *FilmRepository) GetWithSort(column, direction string) ([]model.Film, er
 	}
 	query = fmt.Sprintf(query, column)
 	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	films := []model.Film{}
+	for rows.Next() {
+		film := model.Film{}
+		err := rows.Scan(&film.Id, &film.Name, &film.Description, &film.ReleaseDate, &film.Rating)
+		if err != nil {
+			continue // TODO log
+		}
+		films = append(films, film)
+	}
+	return films, nil
+}
+
+func (r *FilmRepository) GetByActorName(actorName string) ([]model.Film, error) {
+	query := `
+	SELECT DISTINCT film.id, film.name, description, release_date, rating 
+	FROM film
+	JOIN actor_film ON film.id = film_id
+	JOIN actor ON actor.id = actor_id
+	WHERE actor.name = $1
+	`
+
+	rows, err := r.db.Query(query, actorName)
 	if err != nil {
 		return nil, err
 	}

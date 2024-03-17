@@ -7,14 +7,14 @@ import (
 	"github.com/TandDA/filmlib/internal/model"
 )
 
-var sortValues = map[string]struct{} {
+var sortValues = map[string]struct{}{
 	"release_date": {},
 	"name":         {},
 	"rating":       {},
 }
-var directionValues = map[string]struct{} {
-	"asc": {},
-	"desc":         {},
+var directionValues = map[string]struct{}{
+	"asc":  {},
+	"desc": {},
 }
 
 func (h *Handler) saveFilm(w http.ResponseWriter, r *http.Request) {
@@ -63,7 +63,7 @@ func (h *Handler) getFilmByName(w http.ResponseWriter, r *http.Request) {
 	actorName := r.URL.Query().Get("actor")
 	filmName := r.URL.Query().Get("film")
 
-	films, err := h.service.Film.GetByName(filmName,actorName)
+	films, err := h.service.Film.GetByPartialName(filmName, actorName)
 	if err != nil {
 		returnErr(w, http.StatusInternalServerError, err)
 		return
@@ -74,7 +74,7 @@ func (h *Handler) getAllFilmsWithSort(w http.ResponseWriter, r *http.Request) {
 	sort := r.URL.Query().Get("sort")
 	if _, ok := sortValues[sort]; !ok {
 		sort = "rating"
-	} 
+	}
 	direction := r.URL.Query().Get("direction")
 	if _, ok := directionValues[direction]; !ok {
 		direction = "desc"

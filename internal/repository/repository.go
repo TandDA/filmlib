@@ -18,7 +18,8 @@ type Film interface {
 	Save(film model.FilmCreate) (int, error)
 	Update(film model.Film) error
 	Delete(filmId int) error
-	GetByName(filmName, actorName string) ([]model.Film, error)
+	GetByPartialName(filmName, actorName string) ([]model.Film, error)
+	GetByActorName(actorName string) ([]model.Film, error)
 	GetWithSort(column, direction string) ([]model.Film, error)
 }
 
