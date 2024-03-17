@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"regexp"
 
 	"github.com/TandDA/filmlib/internal/model"
 )
@@ -14,19 +15,26 @@ type Actor interface {
 }
 
 type Film interface {
-	Save(film model.Film) (int, error)
+	Save(film model.FilmCreate) (int, error)
 	Update(film model.Film) error
 	Delete(filmId int) error
-	GetByName(filmName, actorName string) ([]Film, error)
-	GetWithSort() ([]Film, error)
+	GetByName(filmName, actorName string) ([]model.Film, error)
+	GetWithSort(column, direction string) ([]model.Film, error)
 }
 
 type Repository struct {
 	Actor
+	Film
 }
 
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
 		Actor: NewActorRepository(db),
+		Film:  NewFilmRepository(db),
 	}
+}
+
+func validParam(param string) bool {
+	valid := regexp.MustCompile("^[A-Za-z0-9_]+$")
+	return valid.MatchString(param)
 }

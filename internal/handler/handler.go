@@ -21,6 +21,12 @@ func (h *Handler) InitRoutes() http.Handler {
 	stdMux.HandleFunc("/actor/save", h.saveActor)
 	stdMux.HandleFunc("/actor/update", h.updateActor)
 	stdMux.HandleFunc("/actor/delete", h.deleteActor)
+
+	stdMux.HandleFunc("/film/all", h.getAllFilmsWithSort)
+	stdMux.HandleFunc("/film/name", h.getFilmByName)
+	stdMux.HandleFunc("/film/update", h.updateFilm)
+	stdMux.HandleFunc("/film/delete", h.deleteFilm)
+	stdMux.HandleFunc("/film/save", h.saveFilm)
 	return stdMux
 }
 

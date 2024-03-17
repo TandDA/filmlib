@@ -36,14 +36,14 @@ func (r *ActorRepository) Update(actor model.ActorUpdate) error {
 		tx.Rollback()
 		return err
 	}
-	for addId := range actor.AddFilmIds {
-		_, err := tx.Exec("INSERT INTO actor_film(actor_id, film_id) VALUES ($1, $2);", actor.Id, addId)
+	for _, addId := range actor.AddFilmIds {
+		_, err := tx.Exec("INSERT INTO actor_film(actor_id, film_id) VALUES ($1, $2);", actor.Id, addId) // TODO insert many method
 		if err != nil {
 			tx.Rollback()
 			return err
 		}
 	}
-	for delId := range actor.AddFilmIds {
+	for _, delId := range actor.AddFilmIds {
 		_, err := tx.Exec("DELETE FROM actor_film(actor_id, film_id) WHERE actor_id=$1 AND film_id=$2;", actor.Id, delId)
 		if err != nil {
 			tx.Rollback()

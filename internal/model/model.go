@@ -21,6 +21,11 @@ type Film struct {
 	Rating      int    `json:"rating"`
 }
 
+type FilmCreate struct {
+	Film
+	Actors []int
+}
+
 type ActorUpdate struct {
 	Id            int    `json:"id"`
 	Name          string `json:"name"`

@@ -13,17 +13,21 @@ type Actor interface {
 }
 
 type Film interface {
-	Save(actor model.Film) (int, error)
-	Update(actor model.Film) error
+	Save(film model.FilmCreate) (int, error)
+	Update(film model.Film) error
 	Delete(filmId int) error
-	GetByName(filmName, actorName string) ([]Film, error)
-	GetWithSort() ([]Film, error)
+	GetByName(filmName, actorName string) ([]model.Film, error)
+	GetWithSort(column, direction string) ([]model.Film, error)
 }
 
 type Service struct {
 	Actor
+	Film
 }
 
 func NewService(repo *repository.Repository) *Service {
-	return &Service{Actor: NewActorService(repo.Actor)}
+	return &Service{
+		Actor: NewActorService(repo.Actor),
+		Film: NewFilmService(repo.Film),
+	}
 }
