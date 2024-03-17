@@ -24,7 +24,7 @@ func (r *FilmRepository) Save(film model.FilmCreate) (int, error) {
 	}
 	query := "INSERT INTO film(name, description, release_date, rating) VALUES($1,$2,$3,$4) RETURNING id;"
 	var id int
-	row := tx.QueryRow(query, film.Name, film.Description, film.ReleaseDate.GetString(), film.Rating) // TODO огарничения на входные данные
+	row := tx.QueryRow(query, film.Name, film.Description, film.ReleaseDate.GetString(), film.Rating)
 	err = row.Scan(&id)
 	if err != nil {
 		tx.Rollback()
@@ -83,7 +83,7 @@ func (r *FilmRepository) GetWithSort(column, direction string) ([]model.Film, er
 		query = "SELECT * FROM film ORDER BY %s DESC;"
 	}
 	if !validParam(column) {
-		return nil, errors.New("SQL injection alert") //TODO create error
+		return nil, errors.New("SQL injection alert")
 	}
 	query = fmt.Sprintf(query, column)
 	rows, err := r.db.Query(query)

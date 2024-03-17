@@ -5,14 +5,19 @@ import (
 	"net/http"
 
 	"github.com/TandDA/filmlib/internal/service"
+	"github.com/go-playground/validator/v10"
 )
 
 type Handler struct {
 	service *service.Service
+	validate *validator.Validate
 }
 
-func NewHandler(service *service.Service) *Handler {
-	return &Handler{service: service}
+func NewHandler(service *service.Service, validate *validator.Validate) *Handler {
+	return &Handler{
+		service: service,
+		validate: validate,
+	}
 }
 
 func (h *Handler) InitRoutes() http.Handler {

@@ -24,6 +24,11 @@ func (h *Handler) saveFilm(w http.ResponseWriter, r *http.Request) {
 		returnErr(w, http.StatusBadRequest, err)
 		return
 	}
+	err = h.validate.Struct(film)
+	if err != nil {
+		returnErr(w, http.StatusBadRequest, err)
+		return
+	}
 	id, err := h.service.Film.Save(film)
 	if err != nil {
 		returnErr(w, http.StatusInternalServerError, err)
@@ -34,6 +39,11 @@ func (h *Handler) saveFilm(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) updateFilm(w http.ResponseWriter, r *http.Request) {
 	var updFilm model.Film
 	err := json.NewDecoder(r.Body).Decode(&updFilm)
+	if err != nil {
+		returnErr(w, http.StatusBadRequest, err)
+		return
+	}
+	err = h.validate.Struct(updFilm)
 	if err != nil {
 		returnErr(w, http.StatusBadRequest, err)
 		return

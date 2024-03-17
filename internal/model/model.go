@@ -15,10 +15,10 @@ type Actor struct {
 
 type Film struct {
 	Id          int    `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Name        string `json:"name" validate:"min=1,max=150"`
+	Description string `json:"description" validate:"max=1000"`
 	ReleaseDate Date   `json:"release_date"`
-	Rating      int    `json:"rating"`
+	Rating      int    `json:"rating" validate:"min=1,max=10"`
 }
 
 type FilmCreate struct {

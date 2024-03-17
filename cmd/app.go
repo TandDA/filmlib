@@ -8,6 +8,7 @@ import (
 	"github.com/TandDA/filmlib/internal/handler"
 	"github.com/TandDA/filmlib/internal/repository"
 	"github.com/TandDA/filmlib/internal/service"
+	"github.com/go-playground/validator/v10"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -21,10 +22,10 @@ func main() {
 		return
 	}
 	doMigration(db)
-
+	validate := validator.New()
 	repo := repository.NewRepository(db)
 	service := service.NewService(repo)
-	handler := handler.NewHandler(service)
+	handler := handler.NewHandler(service, validate)
 	http.ListenAndServe(":8080", handler.InitRoutes())
 }
 
