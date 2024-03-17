@@ -23,19 +23,28 @@ func NewHandler(service *service.Service, validate *validator.Validate) *Handler
 }
 
 func (h *Handler) InitRoutes() http.Handler {
-	stdMux := http.NewServeMux()
-	stdMux.HandleFunc("/actor/all", h.getAllActors)
-	stdMux.HandleFunc("/actor/save", h.saveActor)
-	stdMux.HandleFunc("/actor/update", h.updateActor)
-	stdMux.HandleFunc("/actor/delete", h.deleteActor)
+	admMux := http.NewServeMux()
+	admMux.HandleFunc("/actor/save", h.saveActor)
+	admMux.HandleFunc("/actor/update", h.updateActor)
+	admMux.HandleFunc("/actor/delete", h.deleteActor)
+	admMux.HandleFunc("/film/update", h.updateFilm)
+	admMux.HandleFunc("/film/delete", h.deleteFilm)
+	admMux.HandleFunc("/film/save", h.saveFilm)
 
-	stdMux.HandleFunc("/film/all", h.getAllFilmsWithSort)
-	stdMux.HandleFunc("/film/name", h.getFilmByName)
-	stdMux.HandleFunc("/film/update", h.updateFilm)
-	stdMux.HandleFunc("/film/delete", h.deleteFilm)
-	stdMux.HandleFunc("/film/save", h.saveFilm)
+	userMux := http.NewServeMux()
+	userMux.HandleFunc("/actor/all", h.getAllActors)
 
-	siteHandler := middleware.Logger(stdMux)
+	userMux.HandleFunc("/film/all", h.getAllFilmsWithSort)
+	userMux.HandleFunc("/film/name", h.getFilmByName)
+
+	userMux.Handle("/", middleware.AdminAuth(admMux))
+	userMux.HandleFunc("/user/auth", h.AuthUser)
+
+	openMux := http.NewServeMux()
+	openMux.Handle("/", middleware.UserAuth(userMux))
+	openMux.HandleFunc("/user/auth", h.AuthUser)
+
+	siteHandler := middleware.Logger(openMux)
 	return siteHandler
 }
 

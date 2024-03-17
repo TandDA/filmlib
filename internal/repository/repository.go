@@ -23,15 +23,21 @@ type Film interface {
 	GetWithSort(column, direction string) ([]model.Film, error)
 }
 
+type User interface {
+	GetByEmail(email string) (model.User, error)
+}
+
 type Repository struct {
 	Actor
 	Film
+	User
 }
 
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
 		Actor: NewActorRepository(db),
 		Film:  NewFilmRepository(db),
+		User: NewUserRepository(db),
 	}
 }
 

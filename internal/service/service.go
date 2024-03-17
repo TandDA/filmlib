@@ -20,14 +20,20 @@ type Film interface {
 	GetWithSort(column, direction string) ([]model.Film, error)
 }
 
+type User interface {
+	GetByEmail(email string) (model.User, error)
+}
+
 type Service struct {
 	Actor
 	Film
+	User
 }
 
 func NewService(repo *repository.Repository) *Service {
 	return &Service{
 		Actor: NewActorService(repo.Actor, repo.Film),
 		Film:  NewFilmService(repo.Film),
+		User:  NewUserService(repo.User),
 	}
 }

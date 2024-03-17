@@ -19,6 +19,23 @@ CREATE TABLE actor_film(
 	FOREIGN KEY (film_id) REFERENCES film (id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS roles (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    role_id INTEGER,
+    email VARCHAR(255) NULL,
+    password VARCHAR(255),
+    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE 
+);
+
+INSERT INTO roles(name) VALUES('admin'),('user');
+
+INSERT INTO users(role_id, email, password) VALUES(1,'admin@m.ru','passwordHash'), (2,'user@m.ru','passwordHash');
+
 INSERT INTO actor(name, male, birth_date) VALUES ('Tom Hanks', true, '1956-07-09');
 INSERT INTO actor(name, male, birth_date) VALUES ('Meryl Streep', false, '1949-06-22');
 INSERT INTO actor(name, male, birth_date) VALUES ('Leonardo DiCaprio', true, '1974-11-11');

@@ -5,6 +5,13 @@ import (
 	"time"
 )
 
+type User struct {
+	Id int `json:"id"`
+	Email string `json:"email"`
+	Password string `json:"password"`
+	RoleId int `json:"role_id"`
+}
+
 type Actor struct {
 	Id        int    `json:"id"`
 	Name      string `json:"name"`
