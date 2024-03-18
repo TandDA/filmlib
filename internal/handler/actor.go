@@ -21,11 +21,12 @@ type saveActorDTO struct {
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} []model.Actor
+// @Failure 500 {object} errorResponse "Failed to get all actors"
 // @Router /actor/all [get]
 func (h *Handler) getAllActors(w http.ResponseWriter, r *http.Request) {
 	actors, err := h.service.Actor.GetAll()
 	if err != nil {
-		returnErr(w, http.StatusInternalServerError, err)
+		returnErr(w, http.StatusInternalServerError, "Failed to get all actors")
 		return
 	}
 	returnJSON(w, actors, http.StatusOK)
@@ -39,14 +40,14 @@ func (h *Handler) getAllActors(w http.ResponseWriter, r *http.Request) {
 // @Tags Actors
 // @Param actor body saveActorDTO true "Actor object to be saved"
 // @Success 201 {object} idStruct "Returns the ID of the saved actor"
-// @Failure 400 {object} error "Bad request"
-// @Failure 500 {object} error "Internal server error"
+// @Failure 400 {object} errorResponse "Failed to decode request body. Invalid JSON"
+// @Failure 500 {object} errorResponse "Failed to save actor"
 // @Router /actor/save [post]
 func (h *Handler) saveActor(w http.ResponseWriter, r *http.Request) {
 	var actor saveActorDTO
 	err := json.NewDecoder(r.Body).Decode(&actor)
 	if err != nil {
-		returnErr(w, http.StatusBadRequest, err)
+		returnErr(w, http.StatusBadRequest, "Failed to decode request body. Invalid JSON")
 		return
 	}
 	id, err := h.service.Actor.Save(model.Actor{
@@ -55,7 +56,7 @@ func (h *Handler) saveActor(w http.ResponseWriter, r *http.Request) {
 		BirthDate: actor.BirthDate,
 	})
 	if err != nil {
-		returnErr(w, http.StatusInternalServerError, err)
+		returnErr(w, http.StatusInternalServerError, "Failed to save actor")
 		return
 	}
 	returnJSON(w, idStruct{id}, http.StatusCreated)
@@ -69,19 +70,19 @@ func (h *Handler) saveActor(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param body body model.ActorUpdate true "Actor data to be updated"
 // @Success 200
-// @Failure 400 {object} error "Bad request"
-// @Failure 500 {object} error "Internal server error"
+// @Failure 400 {object} errorResponse "Failed to decode request body. Invalid JSON"
+// @Failure 500 {object} errorResponse "Failed to update actor"
 // @Router /actor/update [put]
 func (h *Handler) updateActor(w http.ResponseWriter, r *http.Request) {
 	var updActor model.ActorUpdate
 	err := json.NewDecoder(r.Body).Decode(&updActor)
 	if err != nil {
-		returnErr(w, http.StatusBadRequest, err)
+		returnErr(w, http.StatusBadRequest, "Failed to decode request body. Invalid JSON")
 		return
 	}
 	err = h.service.Actor.Update(updActor)
 	if err != nil {
-		returnErr(w, http.StatusInternalServerError, err)
+		returnErr(w, http.StatusInternalServerError, "Failed to update actor")
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -95,19 +96,19 @@ func (h *Handler) updateActor(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param body body idStruct true "Actor ID to delete"
 // @Success 200
-// @Failure 400 {object} error "Bad Request"
-// @Failure 500 {object} error "Internal Server Error"
+// @Failure 400 {object} errorResponse "Failed to decode request body. Invalid JSON"
+// @Failure 500 {object} errorResponse "Failed to delete actor"
 // @Router /actor/delete [delete]
 func (h *Handler) deleteActor(w http.ResponseWriter, r *http.Request) {
 	var actorId idStruct
 	err := json.NewDecoder(r.Body).Decode(&actorId)
 	if err != nil {
-		returnErr(w, http.StatusBadRequest, err)
+		returnErr(w, http.StatusBadRequest, "Failed to decode request body. Invalid JSON")
 		return
 	}
 	err = h.service.Actor.Delete(actorId.Id)
 	if err != nil {
-		returnErr(w, http.StatusInternalServerError, err)
+		returnErr(w, http.StatusInternalServerError, "Failed to delete actor")
 		return
 	}
 	w.WriteHeader(http.StatusOK)

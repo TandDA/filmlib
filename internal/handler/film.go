@@ -24,24 +24,24 @@ var directionValues = map[string]struct{}{
 // @Produce json
 // @Param film body model.FilmCreate true "Film data to save"
 // @Success 201 {object} idStruct "Film saved successfully"
-// @Failure 400 {string} string "Bad Request"
-// @Failure 500 {string} string "Internal Server Error"
+// @Failure 400 {object} errorResponse "Failed to decode request body. Invalid JSON"
+// @Failure 500 {object} errorResponse "Failed to save film"
 // @Router /film/save [post]
 func (h *Handler) saveFilm(w http.ResponseWriter, r *http.Request) {
 	var film model.FilmCreate
 	err := json.NewDecoder(r.Body).Decode(&film)
 	if err != nil {
-		returnErr(w, http.StatusBadRequest, err)
+		returnErr(w, http.StatusBadRequest, "Failed to decode request body. Invalid JSON")
 		return
 	}
 	err = h.validate.Struct(film)
 	if err != nil {
-		returnErr(w, http.StatusBadRequest, err)
+		returnErr(w, http.StatusBadRequest, err.Error())
 		return
 	}
 	id, err := h.service.Film.Save(film)
 	if err != nil {
-		returnErr(w, http.StatusInternalServerError, err)
+		returnErr(w, http.StatusInternalServerError, "Failed to save film")
 		return
 	}
 	returnJSON(w, idStruct{id}, http.StatusCreated)
@@ -54,24 +54,24 @@ func (h *Handler) saveFilm(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param film body model.Film true "Film object that needs to be updated"
 // @Success 200 {string} string "OK"
-// @Failure 400 {string} string "Bad Request"
-// @Failure 500 {string} string "Internal Server Error"
+// @Failure 400 {object} errorResponse "Failed to decode request body. Invalid JSON"
+// @Failure 500 {object} errorResponse "Failed to update film"
 // @Router /film/update [put]
 func (h *Handler) updateFilm(w http.ResponseWriter, r *http.Request) {
 	var updFilm model.Film
 	err := json.NewDecoder(r.Body).Decode(&updFilm)
 	if err != nil {
-		returnErr(w, http.StatusBadRequest, err)
+		returnErr(w, http.StatusBadRequest, "Failed to decode request body. Invalid JSON")
 		return
 	}
 	err = h.validate.Struct(updFilm)
 	if err != nil {
-		returnErr(w, http.StatusBadRequest, err)
+		returnErr(w, http.StatusBadRequest, err.Error())
 		return
 	}
 	err = h.service.Film.Update(updFilm)
 	if err != nil {
-		returnErr(w, http.StatusInternalServerError, err)
+		returnErr(w, http.StatusInternalServerError, "Failed to update film")
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -84,19 +84,19 @@ func (h *Handler) updateFilm(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param filmId body idStruct true "Film ID to delete"
 // @Success 200 {string} string "Film deleted successfully"
-// @Failure 400 {string} string "Bad request"
-// @Failure 500 {string} string "Internal server error"
+// @Failure 400 {object} errorResponse "Failed to decode request body. Invalid JSON"
+// @Failure 500 {object} errorResponse "Failed to delete film"
 // @Router /film/delete [delete]
 func (h *Handler) deleteFilm(w http.ResponseWriter, r *http.Request) {
 	var filmId idStruct
 	err := json.NewDecoder(r.Body).Decode(&filmId)
 	if err != nil {
-		returnErr(w, http.StatusBadRequest, err)
+		returnErr(w, http.StatusBadRequest, "Failed to decode request body. Invalid JSON")
 		return
 	}
 	err = h.service.Film.Delete(filmId.Id)
 	if err != nil {
-		returnErr(w, http.StatusInternalServerError, err)
+		returnErr(w, http.StatusInternalServerError, "Failed to delete film")
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -109,7 +109,7 @@ func (h *Handler) deleteFilm(w http.ResponseWriter, r *http.Request) {
 // @Param actor query string false "Actor name"
 // @Param film query string false "Partial film name"
 // @Success 200 {array} model.Film "List of films"
-// @Failure 500 {object} error "Internal Server Error"
+// @Failure 500 {object} errorResponse "Failed to get films by partial names"
 // @Router /film/name [get]
 func (h *Handler) getFilmByName(w http.ResponseWriter, r *http.Request) {
 	actorName := r.URL.Query().Get("actor")
@@ -117,7 +117,7 @@ func (h *Handler) getFilmByName(w http.ResponseWriter, r *http.Request) {
 
 	films, err := h.service.Film.GetByPartialName(filmName, actorName)
 	if err != nil {
-		returnErr(w, http.StatusInternalServerError, err)
+		returnErr(w, http.StatusInternalServerError, "Failed to get films by partial names")
 		return
 	}
 	returnJSON(w, films, http.StatusOK)
@@ -130,7 +130,7 @@ func (h *Handler) getFilmByName(w http.ResponseWriter, r *http.Request) {
 // @Param sort query string false "Sort films by: [rating, name, release_date]"
 // @Param direction query string false "Sort direction: [asc, desc]"
 // @Success 200 {array} []model.Film
-// @Failure 500 {object} error
+// @Failure 500 {object} errorResponse "Failed to get films with sort"
 // @Router /film/all [get]
 func (h *Handler) getAllFilmsWithSort(w http.ResponseWriter, r *http.Request) {
 	sort := r.URL.Query().Get("sort")
@@ -143,7 +143,7 @@ func (h *Handler) getAllFilmsWithSort(w http.ResponseWriter, r *http.Request) {
 	}
 	films, err := h.service.Film.GetWithSort(sort, direction)
 	if err != nil {
-		returnErr(w, http.StatusInternalServerError, err)
+		returnErr(w, http.StatusInternalServerError, "Failed to get films with sort")
 		return
 	}
 	returnJSON(w, films, http.StatusOK)

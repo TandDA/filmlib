@@ -12,10 +12,6 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
-type idStruct struct {
-	Id int `json:"id"`
-}
-
 type Handler struct {
 	service  *service.Service
 	validate *validator.Validate
@@ -56,14 +52,6 @@ func (h *Handler) InitRoutes() http.Handler {
 	return siteHandler
 }
 
-func returnErr(w http.ResponseWriter, statusCode int, requestErr error) {
-	js, err := json.Marshal(map[string]string{"err": requestErr.Error()})
-	if err != nil {
-		logrus.Error("Cannot convert error to json")
-	}
-	http.Error(w, string(js), statusCode)
-}
-
 func returnJSON(w http.ResponseWriter, v any, statusCode int) {
 	js, err := json.Marshal(v)
 	if err != nil {
@@ -72,4 +60,8 @@ func returnJSON(w http.ResponseWriter, v any, statusCode int) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	w.Write(js)
+}
+
+type idStruct struct {
+	Id int `json:"id"`
 }
