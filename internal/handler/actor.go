@@ -7,9 +7,6 @@ import (
 	"github.com/TandDA/filmlib/internal/model"
 )
 
-type actorId struct {
-	Id int `json:"id"`
-}
 type saveActorDTO struct {
 	Name      string
 	Male      bool
@@ -41,7 +38,7 @@ func (h *Handler) getAllActors(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Tags Actors
 // @Param actor body saveActorDTO true "Actor object to be saved"
-// @Success 201 {object} actorId "Returns the ID of the saved actor"
+// @Success 201 {object} idStruct "Returns the ID of the saved actor"
 // @Failure 400 {object} error "Bad request"
 // @Failure 500 {object} error "Internal server error"
 // @Router /actor/save [post]
@@ -61,7 +58,7 @@ func (h *Handler) saveActor(w http.ResponseWriter, r *http.Request) {
 		returnErr(w, http.StatusInternalServerError, err)
 		return
 	}
-	returnJSON(w, actorId{id}, http.StatusCreated)
+	returnJSON(w, idStruct{id}, http.StatusCreated)
 }
 
 // @Summary Update actor
@@ -96,13 +93,13 @@ func (h *Handler) updateActor(w http.ResponseWriter, r *http.Request) {
 // @Tags Actors
 // @Accept json
 // @Produce json
-// @Param body body actorId true "Actor ID to delete"
+// @Param body body idStruct true "Actor ID to delete"
 // @Success 200
 // @Failure 400 {object} error "Bad Request"
 // @Failure 500 {object} error "Internal Server Error"
 // @Router /actor/delete [delete]
 func (h *Handler) deleteActor(w http.ResponseWriter, r *http.Request) {
-	var actorId struct{ Id int }
+	var actorId idStruct
 	err := json.NewDecoder(r.Body).Decode(&actorId)
 	if err != nil {
 		returnErr(w, http.StatusBadRequest, err)

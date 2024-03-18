@@ -12,6 +12,10 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
+type idStruct struct {
+	Id int `json:"id"`
+}
+
 type Handler struct {
 	service  *service.Service
 	validate *validator.Validate
