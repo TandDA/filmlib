@@ -7,20 +7,39 @@ import (
 	"github.com/TandDA/filmlib/internal/model"
 )
 
+type actorId struct {
+	Id int `json:"id"`
+}
+
+// @Summary Get All Actors
+// @Security ApiKeyAuth
+// @Tags Actors
+// @Description get all actors
+// @ID get-all-actors
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} []model.Actor
+// @Router /actor/all [get]
 func (h *Handler) getAllActors(w http.ResponseWriter, r *http.Request) {
 	actors, err := h.service.Actor.GetAll()
 	if err != nil {
 		returnErr(w, http.StatusInternalServerError, err)
 		return
 	}
-	json, err := json.Marshal(actors)
-	if err != nil {
-		returnErr(w, http.StatusInternalServerError, err)
-		return
-	}
-	w.Write(json)
+	returnJSON(w, actors, http.StatusOK)
 }
 
+// @Summary Save an actor
+// @Security ApiKeyAuth
+// @Description Save the details of an actor
+// @Accept  json
+// @Produce json
+// @Tags Actors
+// @Param actor body model.Actor true "Actor object to be saved"
+// @Success 201 {object} actorId "Returns the ID of the saved actor"
+// @Failure 400 {object} error "Bad request"
+// @Failure 500 {object} error "Internal server error"
+// @Router /actor/save [post]
 func (h *Handler) saveActor(w http.ResponseWriter, r *http.Request) {
 	var actor model.Actor
 	err := json.NewDecoder(r.Body).Decode(&actor)
@@ -33,9 +52,20 @@ func (h *Handler) saveActor(w http.ResponseWriter, r *http.Request) {
 		returnErr(w, http.StatusInternalServerError, err)
 		return
 	}
-	returnJSON(w, map[string]int{"id": id}, http.StatusCreated)
+	returnJSON(w, actorId{id}, http.StatusCreated)
 }
 
+// @Summary Update actor
+// @Security ApiKeyAuth
+// @Description Update an existing actor
+// @Tags Actors
+// @Accept json
+// @Produce json
+// @Param body body model.ActorUpdate true "Actor data to be updated"
+// @Success 200
+// @Failure 400 {object} error "Bad request"
+// @Failure 500 {object} error "Internal server error"
+// @Router /actor/update [put]
 func (h *Handler) updateActor(w http.ResponseWriter, r *http.Request) {
 	var updActor model.ActorUpdate
 	err := json.NewDecoder(r.Body).Decode(&updActor)
@@ -51,6 +81,17 @@ func (h *Handler) updateActor(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// @Summary Delete an actor
+// @Security ApiKeyAuth
+// @Description Delete an actor by ID
+// @Tags Actors
+// @Accept json
+// @Produce json
+// @Param body body actorId true "Actor ID to delete"
+// @Success 200
+// @Failure 400 {object} error "Bad Request"
+// @Failure 500 {object} error "Internal Server Error"
+// @Router /actor/delete [delete]
 func (h *Handler) deleteActor(w http.ResponseWriter, r *http.Request) {
 	var actorId struct{ Id int }
 	err := json.NewDecoder(r.Body).Decode(&actorId)

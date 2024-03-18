@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 
+	_ "github.com/TandDA/filmlib/docs"
 	"github.com/TandDA/filmlib/internal/middleware"
 	"github.com/TandDA/filmlib/internal/service"
 	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
 type Handler struct {
@@ -43,7 +45,9 @@ func (h *Handler) InitRoutes() http.Handler {
 	openMux := http.NewServeMux()
 	openMux.Handle("/", middleware.UserAuth(userMux))
 	openMux.HandleFunc("/user/auth", h.AuthUser)
-
+	openMux.HandleFunc("/swagger/", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
+	))
 	siteHandler := middleware.Logger(openMux)
 	return siteHandler
 }
@@ -61,6 +65,7 @@ func returnJSON(w http.ResponseWriter, v any, statusCode int) {
 	if err != nil {
 		logrus.Error("Cannot convert object to json")
 	}
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	w.Write(js)
 }

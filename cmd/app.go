@@ -16,6 +16,17 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// @title Filmlib API
+// @version 1.0
+// @description API Server for films and actors
+
+// @host localhost:8080
+// @BasePath /
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+
 func main() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 

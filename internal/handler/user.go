@@ -5,12 +5,28 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/TandDA/filmlib/internal/model"
 	"github.com/TandDA/filmlib/internal/util"
 )
 
+type signInNpit struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+type jwtResponse struct {
+	JWT string `json:"jwt"`
+}
+
+// @Summary SignIn
+// @Tags auth
+// @Description login
+// @ID login
+// @Accept  json
+// @Produce  json
+// @Param input body signInNpit true "credentials"
+// @Success 200 {string} map[string]string "token"
+// @Router /user/auth [post]
 func (h *Handler) AuthUser(w http.ResponseWriter, r *http.Request) {
-	requestUser := model.User{}
+	requestUser := signInNpit{}
 	err := json.NewDecoder(r.Body).Decode(&requestUser)
 	if err != nil {
 		returnErr(w, http.StatusBadRequest, err)
@@ -26,5 +42,6 @@ func (h *Handler) AuthUser(w http.ResponseWriter, r *http.Request) {
 		returnErr(w, http.StatusInternalServerError, err)
 		return
 	}
-	returnJSON(w, map[string]string{"jwt": jwtStr}, http.StatusOK)
+	w.Header().Add("Content-Type", "application/json")
+	returnJSON(w, jwtResponse{jwtStr}, http.StatusOK)
 }
