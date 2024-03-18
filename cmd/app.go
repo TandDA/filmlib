@@ -30,7 +30,7 @@ import (
 func main() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 
-	db, err := sql.Open("postgres", "postgres://postgres:123@localhost:5432/postgres?sslmode=disable") // TODO вернуть db вместо localhost
+	db, err := sql.Open("postgres", "postgres://postgres:123@db:5432/postgres?sslmode=disable")
 	if err != nil {
 		log.Print(err)
 		return
@@ -40,7 +40,7 @@ func main() {
 	repo := repository.NewRepository(db)
 	service := service.NewService(repo)
 	handler := handler.NewHandler(service, validate)
-	http.ListenAndServe(":8080", handler.InitRoutes())
+	http.ListenAndServe(":8080", handler.InitRoutes()) // TODO graceful shutdown
 }
 
 func doMigration(db *sql.DB) {
