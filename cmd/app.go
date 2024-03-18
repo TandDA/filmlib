@@ -19,7 +19,7 @@ import (
 func main() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 
-	db, err := sql.Open("postgres", "postgres://postgres:123@localhost:5432/postgres?sslmode=disable")
+	db, err := sql.Open("postgres", "postgres://postgres:123@localhost:5432/postgres?sslmode=disable") // TODO вернуть db вместо localhost
 	if err != nil {
 		log.Print(err)
 		return
