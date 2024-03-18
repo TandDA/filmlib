@@ -44,7 +44,7 @@ func (r *ActorRepository) Update(actor model.ActorUpdate) error {
 			return err
 		}
 	}
-	for _, delId := range actor.AddFilmIds {
+	for _, delId := range actor.DeleteFilmIds {
 		_, err := tx.Exec("DELETE FROM actor_film(actor_id, film_id) WHERE actor_id=$1 AND film_id=$2;", actor.Id, delId)
 		if err != nil {
 			tx.Rollback()

@@ -10,6 +10,11 @@ import (
 type actorId struct {
 	Id int `json:"id"`
 }
+type saveActorDTO struct {
+	Name      string
+	Male      bool
+	BirthDate model.Date
+}
 
 // @Summary Get All Actors
 // @Security ApiKeyAuth
@@ -35,19 +40,23 @@ func (h *Handler) getAllActors(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce json
 // @Tags Actors
-// @Param actor body model.Actor true "Actor object to be saved"
+// @Param actor body saveActorDTO true "Actor object to be saved"
 // @Success 201 {object} actorId "Returns the ID of the saved actor"
 // @Failure 400 {object} error "Bad request"
 // @Failure 500 {object} error "Internal server error"
 // @Router /actor/save [post]
 func (h *Handler) saveActor(w http.ResponseWriter, r *http.Request) {
-	var actor model.Actor
+	var actor saveActorDTO
 	err := json.NewDecoder(r.Body).Decode(&actor)
 	if err != nil {
 		returnErr(w, http.StatusBadRequest, err)
 		return
 	}
-	id, err := h.service.Actor.Save(actor)
+	id, err := h.service.Actor.Save(model.Actor{
+		Name:      actor.Name,
+		Male:      actor.Male,
+		BirthDate: actor.BirthDate,
+	})
 	if err != nil {
 		returnErr(w, http.StatusInternalServerError, err)
 		return

@@ -5,6 +5,15 @@ definitions:
       id:
         type: integer
     type: object
+  handler.saveActorDTO:
+    properties:
+      birthDate:
+        type: string
+      male:
+        type: boolean
+      name:
+        type: string
+    type: object
   handler.signInNpit:
     properties:
       email:
@@ -130,7 +139,7 @@ paths:
         name: actor
         required: true
         schema:
-          $ref: '#/definitions/model.Actor'
+          $ref: '#/definitions/handler.saveActorDTO'
       produces:
       - application/json
       responses:
