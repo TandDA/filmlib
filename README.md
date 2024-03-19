@@ -14,3 +14,7 @@ admin credentials:
   - email: admin@m.ru
   
   - password: passwordHash
+
+**Важно**
+
+нужно предавать Authorization в формате: Bearer [jwt]
